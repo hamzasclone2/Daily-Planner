@@ -1,4 +1,6 @@
-﻿using System;
+//Written by Hamza Hameed and Jonah Mooradian
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,21 +8,23 @@ using UnityEngine.UI;
 
 public class createEventScript : MonoBehaviour {
 
-	public EventMaker eventMaker;
 
 	public InputField nameField;
 	public InputField locationField; 
 	public GameObject Event;
 	public Transform weeklyViewCanvas;
 	public Transform createEventCanvas;
+	public Transform dailyViewCanvas;
 
-	private float startDay = -525.5f;
-	private float startTime = 576;
+	private float startDay = -525f;
+	private float startTime = 576f;
 
 	public Toggle[] alarmToggles = new Toggle[11];
 
 	int startHourInt;
 	int endHourInt;
+
+	int startHeight;
 
 	int counter = 0;
 	int eventLength = 0;
@@ -48,8 +52,6 @@ public class createEventScript : MonoBehaviour {
 
 	Text tagOption;
 
-	//John's scripts
-	public EventManager em;
 
 	void Start(){
 		startHour = createEventCanvas.Find("Time/StartTime/hoursDrop/Label").GetComponent<Text>();
@@ -74,7 +76,7 @@ public class createEventScript : MonoBehaviour {
 		eventYear = createEventCanvas.Find ("EventDate/year/Text").GetComponent<Text> ();
 
 		tagOption = createEventCanvas.Find ("EventTag/tagOptions/Label").GetComponent<Text> ();
-		eventMaker.saveNewAlarms (alarmToggles);
+		startHeight = 180;
 	}
 
 	public void eventCreate(){
@@ -92,6 +94,9 @@ public class createEventScript : MonoBehaviour {
 				
 			Transform newEvent = Instantiate (Event).transform;
 			newEvent.transform.SetParent (weeklyViewCanvas, false);
+
+			Transform dailyEvent = Instantiate (Event).transform;
+			dailyEvent.transform.SetParent (dailyViewCanvas, false);
 
 			if (tagOption.text == "General") {
 				newEvent.GetComponent<Image> ().color = new Color32(255, 241, 197, 255);
@@ -119,8 +124,8 @@ public class createEventScript : MonoBehaviour {
 				}
 				newEvent.GetComponent<RectTransform> ().anchoredPosition = new Vector3 (startDay, startTime, 0);
 			}
-			startTime = 576;
-			startDay = -525.5f;
+			startTime = 576f;
+			startDay = -525f;
 
 			if (eventLength != 24) {
 				Text newText = newEvent.Find ("Text").GetComponent<Text> ();
@@ -135,68 +140,65 @@ public class createEventScript : MonoBehaviour {
 				+ "All Day";
 			}
 
-			/*string year;
+			string year;
 			string month;
 			string day;
 
-			if (toggleGroup.AnyTogglesOn ()) {
-				DateTime sunday = DateTime.Today.AddDays (-1 * (int)DateTime.Today.DayOfWeek + (7 * counter));
-				DateTime monday = sunday.AddDays (1);
-				DateTime tuesday = sunday.AddDays (2);
-				DateTime wednesday = sunday.AddDays (3);
-				DateTime thursday = sunday.AddDays (4);
-				DateTime friday = sunday.AddDays (5);
-				DateTime saturday = sunday.AddDays (6);
-
-				if (sundayToggle.isOn) {
-					day = sunday.Day
-				} else if (mondayToggle.isOn) {
-
-				} else if (tuesdayToggle.isOn) {
-
-				} else if (wednesdayToggle.isOn) {
-
-				} else if (thursdayToggle.isOn) {
-
-				} else if (fridayToggle.isOn) {
-
-				} else if (saturdayToggle.isOn) {
-
+			DateTime startofWeek = DateTime.Today.AddDays (-1 * (int)DateTime.Today.DayOfWeek);
+			DateTime selectedDay = startofWeek;
+			if (sundayToggle.isOn) {
+				selectedDay = startofWeek;
+			} else if (mondayToggle.isOn) {
+				selectedDay = startofWeek.AddDays (1);
+			} else if (tuesdayToggle.isOn) {
+				selectedDay = startofWeek.AddDays (2);
+			} else if (wednesdayToggle.isOn) {
+				selectedDay = startofWeek.AddDays (3);
+			} else if (thursdayToggle.isOn) {
+				selectedDay = startofWeek.AddDays (4);
+			} else if (fridayToggle.isOn) {
+				selectedDay = startofWeek.AddDays (5);
+			} else if (saturdayToggle.isOn) {
+				selectedDay = startofWeek.AddDays (6);
+			}
+				
+			if (DateTime.Today == selectedDay) {
+				if (eventLength != 24) {
+					Text newText = dailyEvent.Find ("Text").GetComponent<Text> ();
+					newText.text = " " + nameField.text + "\n"
+						+ " @ " + locationField.text + "\n"
+						+ " " + startHour.text + ":" + startMinutes.text + startAMPM.text + " - " +
+						endHour.text + ":" + endMinutes.text + endAMPM.text;
+				} else {
+					Text newText = dailyEvent.Find ("Text").GetComponent<Text> ();
+					newText.text = " " + nameField.text + "\n"
+						+ " @ " + locationField.text + "\n"
+						+ "All Day";
 				}
-			}*/
 
-			/*
-			em.loadSelectedDay(sunday.year, sunday.month, sunday.day);
-			Event firstEvent = em.selectedDay [0];
-			*/
+				if (tagOption.text == "General") {
+					dailyEvent.GetComponent<Image> ().color = new Color32(255, 241, 197, 255);
+				} else if (tagOption.text == "Holiday") {
+					dailyEvent.GetComponent<Image> ().color = new Color32 (224, 255, 182, 255);
+				}else if (tagOption.text == "Birthday") {
+					dailyEvent.GetComponent<Image> ().color = new Color32 (255, 161, 233, 255);
+				}else if (tagOption.text == "Party") {
+					dailyEvent.GetComponent<Image> ().color = new Color32 (86, 234, 232, 255);
+				}else if (tagOption.text == "School") {
+					dailyEvent.GetComponent<Image> ().color = new Color32 (255, 161, 75, 255);
+				}else if (tagOption.text == "Work") {
+					dailyEvent.GetComponent<Image> ().color = new Color32 (160, 143, 255, 255);
+				}
 
-			eventMaker.setEventName (nameField.text);
-			eventMaker.setLocation (locationField.text);
-			eventMaker.setTag (tagOption.text);
-			eventMaker.setYear (eventYear.text);
-			eventMaker.setMonth (eventMonth.text);
-			eventMaker.setDay (eventDate.text);
-			eventMaker.setEndHour (endHour.text);
-			eventMaker.setEndMinute (endMinutes.text);
-			eventMaker.setStartMinute (startMinutes.text);
-			eventMaker.setStartHour (startHour.text);
-			eventMaker.saveNewAlarms (alarmToggles);
-
-			//loadEvents (DateTime.Today);
+				dailyEvent.GetComponent<RectTransform> ().sizeDelta = new Vector2 (175, 50);
+				dailyEvent.GetComponent<RectTransform> ().anchoredPosition = new Vector3 (0, startHeight, 0);
+				startHeight -= 50;
+			}
 
 		} else {
 			Debug.Log ("Error: Event Length is less than 1");
 		}
 
-	}
-
-	void loadEvents(DateTime day){
-		if (em.loadSelectedDay (day.Year.ToString(), day.Month.ToString(), day.Day.ToString())) {
-			for(int i = 0; i < em.selectedDay.Count; i++){
-				em.selectedDay[i].eventName = "hi";
-				Debug.Log ("it worked?");
-			}
-		}
 	}
 
 	void setEventLength(){
@@ -239,27 +241,5 @@ public class createEventScript : MonoBehaviour {
 		}else if (saturdayToggle.isOn == true) {
 			startDay += 6 * 175;
 		}
-	}
-
-	public void fillUI(string monthString, string dateString, string yearString){
-		for (int i = 0; i < 7; i++) {
-			DateTime startofWeek = DateTime.Today.AddDays (-1 * (int)DateTime.Today.DayOfWeek + i + (counter * 7));
-			monthString = startofWeek.Month.ToString ();
-			dateString = startofWeek.Day.ToString ();
-			yearString = startofWeek.Year.ToString ();
-
-
-			em.loadSelectedDay (yearString, monthString, dateString);
-
-			for (int j = 0; j < em.selectedDay.Count; j++) {
-				loadEvent (em.selectedDay [j]);
-			}
-		}
-	}
-
-	public void loadEvent(Event chosenEvent)
-	{
-		startHourInt = int.Parse(chosenEvent.startTime.Hours);
-		endHourInt = int.Parse(chosenEvent.endTime.Hours);
 	}
 }
