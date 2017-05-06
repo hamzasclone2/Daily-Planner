@@ -1,4 +1,6 @@
-﻿using System.Collections;
+//Written by John Ying
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
